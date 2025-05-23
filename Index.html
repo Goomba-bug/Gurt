@@ -1,0 +1,982 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #shop-section {
+            scroll-margin-top: 80px;
+        }
+        .powerup-card {
+            background-color: #f7fafc;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            display: flex; /* For better alignment within card */
+            flex-direction: column;
+            justify-content: space-between; /* Pushes button to bottom */
+        }
+        .powerup-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        .powerup-description {
+            font-size: 0.875rem;
+            color: #4a5568;
+            margin-bottom: 0.75rem;
+            flex-grow: 1; /* Allows description to take available space */
+        }
+        .powerup-price {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .buy-button {
+            margin-top: 1rem;
+            background-color: #f59e0b;
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.875rem;
+            border: none;
+        }
+        .buy-button:hover {
+            background-color: #ed8936;
+        }
+        .buy-button:disabled {
+            background-color: #cbd5e0;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .powerup-icon {
+            background-color: #ffc107;
+            color: #333;
+            padding: 6px 10px;
+            border: 1px solid #e0a800;
+            border-radius: 20px;
+            cursor: default;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            min-width: 80px;
+            justify-content: center;
+        }
+        .powerup-icon:hover {
+            background-color: #ffca2c;
+        }
+        .control-button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .answer-option-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            background-color: #e2e8f0 !important;
+        }
+        .unit-button-container button {
+            margin-left: 0.25rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .unit-button-container button:first-child {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
+        .unit-button-container button:last-child {
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-blue-200 to-green-200 min-h-screen flex flex-col justify-start items-center p-4">
+
+    <div id="purchased-powerups-container" style="position: fixed; top: 10px; left: 10px; z-index: 1000; display: flex; flex-direction: column; gap: 8px;">
+        </div>
+    <div id="powerup-tooltip" style="position: absolute; display: none; background-color: rgba(0,0,0,0.85); color: white; border: 1px solid #333; padding: 8px; border-radius: 5px; z-index: 1001; font-size: 0.85em; max-width: 200px; line-height: 1.4;">
+        </div>
+
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-3xl transition-transform hover:scale-105 relative mt-8">
+        <h1 class="text-2xl font-semibold text-blue-600 text-center mb-6">Science Stuff</h1>
+        <a href="#shop-section" id="shop-button" class="absolute top-4 right-4 bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-semibold py-2 px-4 rounded-md transition-colors duration-300">
+            Shop
+        </a>
+        <div class="flex justify-center mb-4">
+            <button id="grade-6-button" class="grade-button bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-semibold py-2 px-4 rounded-l-md transition-colors duration-300">
+                6th Grade
+            </button>
+            <button id="grade-7-button" class="grade-button bg-blue-400 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-r-md transition-colors duration-300">
+                7th Grade
+            </button>
+        </div>
+        <div id="unit-button-container" class="unit-button-container flex flex-wrap justify-center mb-4">
+            <button id="unit-1-button" data-unit="1" class="unit-button text-white font-semibold py-2 px-3 text-sm rounded-md transition-colors duration-300">Unit 1</button>
+            <button id="unit-2-button" data-unit="2" class="unit-button text-white font-semibold py-2 px-3 text-sm rounded-md transition-colors duration-300">Unit 2</button>
+            <button id="unit-3-button" data-unit="3" class="unit-button text-white font-semibold py-2 px-3 text-sm rounded-md transition-colors duration-300">Unit 3</button>
+            <button id="unit-4-button" data-unit="4" class="unit-button text-white font-semibold py-2 px-3 text-sm rounded-md transition-colors duration-300">Unit 4</button>
+        </div>
+        <div id="question-container" class="mb-6">
+            <p id="question-text" class="text-lg text-gray-800 text-center">Loading question...</p>
+            <ul id="answer-options" class="mt-4 space-y-2">
+            </ul>
+        </div>
+        <div id="feedback" class="feedback mt-6 p-4 rounded-md text-center font-medium hidden">
+        </div>
+        <div class="controls grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
+            <button id="submit-answer" class="control-button bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors duration-300 w-full hidden col-span-2 sm:col-span-1">
+                Submit Answer
+            </button>
+            <button id="next-question" class="control-button bg-green-500 hover:bg-green-600 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors duration-300 w-full">
+                Next Question
+            </button>
+            <button id="hint-button" class="control-button bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors duration-300 w-full">
+                Hint (10 DNA)
+            </button>
+            <button id="use-fifty-fifty-button" class="control-button bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors duration-300 w-full">
+                Use 50/50
+            </button>
+            <button id="use-skip-button" class="control-button bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors duration-300 w-full">
+                Use Skip
+            </button>
+             <button id="restart-quiz-button" class="control-button bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors duration-300 w-full hidden col-span-2 sm:col-span-1">
+                Restart Quiz
+            </button>
+        </div>
+        <p id="currency-display" class="text-center mt-2 text-yellow-600 font-medium">DNA: 0</p>
+    </div>
+
+    <div id="shop-section" class="w-full max-w-xl mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold text-gray-800 text-center mb-6">Power-Up Shop</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="powerup-card">
+                <h3 class="powerup-title">50/50</h3>
+                <p class="powerup-description">Removes two incorrect answers.</p>
+                <p class="powerup-price">Price: 15 DNA</p>
+                <button class="buy-button" id="buy-fifty-fifty">Buy</button>
+            </div>
+            <div class="powerup-card">
+                <h3 class="powerup-title">Skip Question</h3>
+                <p class="powerup-description">Skips the current question.</p>
+                <p class="powerup-price">Price: 20 DNA</p>
+                <button class="buy-button" id="buy-skip">Buy</button>
+            </div>
+            <div class="powerup-card">
+                <h3 class="powerup-title">DNA Boost</h3>
+                <p class="powerup-description">Doubles DNA earned for 2 correct answers.</p>
+                <p class="powerup-price">Price: 25 DNA</p>
+                <button class="buy-button" id="buy-boost">Buy</button>
+            </div>
+            <div class="powerup-card">
+                <h3 class="powerup-title">Time Freeze ⏳</h3>
+                <p class="powerup-description">Conceptual: Freezes timer for 5s (timer N/A yet).</p>
+                <p class="powerup-price">Price: 10 DNA</p>
+                <button class="buy-button" id="buy-time-freeze">Buy</button>
+            </div>
+            <div class="powerup-card">
+                <h3 class="powerup-title">Answer Shield 🛡️</h3>
+                <p class="powerup-description">Protects from DNA loss on 1 wrong answer.</p>
+                <p class="powerup-price">Price: 30 DNA</p>
+                <button class="buy-button" id="buy-answer-shield">Buy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const questionText = document.getElementById("question-text");
+        const answerOptions = document.getElementById("answer-options");
+        const nextButton = document.getElementById("next-question");
+        const restartQuizButton = document.getElementById("restart-quiz-button");
+        const feedback = document.getElementById("feedback");
+        const currencyDisplay = document.getElementById("currency-display");
+        const grade6Button = document.getElementById("grade-6-button");
+        const grade7Button = document.getElementById("grade-7-button");
+        const unitButtonContainer = document.getElementById("unit-button-container");
+        const submitButton = document.getElementById("submit-answer");
+        const shopButton = document.getElementById("shop-button");
+        const hintButton = document.getElementById("hint-button");
+
+        // Shop Buttons
+        const buyFiftyFiftyButton = document.getElementById("buy-fifty-fifty");
+        const buySkipButton = document.getElementById("buy-skip");
+        const buyBoostButton = document.getElementById("buy-boost");
+        const buyTimeFreezeButton = document.getElementById("buy-time-freeze");
+        const buyAnswerShieldButton = document.getElementById("buy-answer-shield");
+
+        // Power-up Use Buttons
+        const useFiftyFiftyButton = document.getElementById("use-fifty-fifty-button");
+        const useSkipButton = document.getElementById("use-skip-button");
+
+        // Purchased Power-up display elements
+        const purchasedPowerupsContainer = document.getElementById('purchased-powerups-container');
+        const powerupTooltip = document.getElementById('powerup-tooltip');
+
+        // Game State Variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let usedQuestionIndices = [];
+        let currentQuestion;
+        let currency = parseInt(localStorage.getItem('dna')) || 0;
+        let selectedGrade = 7;
+        let selectedUnit = 1;
+        let selectedAnswerElement = null;
+        let fiftyFiftyAppliedThisQuestion = false;
+
+        // Power-up Inventory Counts
+        let fiftyFiftyCount = parseInt(localStorage.getItem('fiftyFiftyCount')) || 0;
+        let skipCount = parseInt(localStorage.getItem('skipCount')) || 0;
+        let boostCount = parseInt(localStorage.getItem('boostCount')) || 0;
+        let timeFreezeCount = parseInt(localStorage.getItem('timeFreezeCount')) || 0;
+        let answerShieldCount = parseInt(localStorage.getItem('answerShieldCount')) || 0;
+        let answerShieldActive = false;
+
+        let boostActive = boostCount > 0;
+
+        // Costs
+        const fiftyFiftyCost = 15;
+        const skipCost = 20;
+        const boostCost = 25;
+        const hintCost = 10;
+        const timeFreezeCost = 10;
+        const answerShieldCost = 30;
+
+
+        currencyDisplay.textContent = `DNA: ${currency}`;
+
+        // Questions Data
+        const questions = {
+            6: { // Grade 6: Earth & Space, Life Science, Physical Science
+                1: [ // Unit 1: Earth and Space Science (20 original + 5 new = 25 total)
+                    { question: "What is the name of the galaxy that contains our Solar System? (6-1)", answers: [{ text: "Andromeda", correct: false }, { text: "Milky Way", correct: true }, { text: "Triangulum", correct: false }, { text: "Whirlpool", correct: false }] },
+                    { question: "Which planet is known for its prominent rings made of ice and rock? (6-1)", answers: [{ text: "Jupiter", correct: false }, { text: "Uranus", correct: false }, { text: "Saturn", correct: true }, { text: "Neptune", correct: false }] },
+                    { question: "What causes the Earth's seasons? (6-1)", answers: [{ text: "The Earth's distance from the Sun", correct: false }, { text: "The Earth's tilt on its axis", correct: true }, { text: "The speed of Earth's rotation", correct: false }, { text: "Volcanic activity", correct: false }] },
+                    { question: "What is the primary gas that makes up Earth's atmosphere? (6-1)", answers: [{ text: "Oxygen", correct: false }, { text: "Carbon Dioxide", correct: false }, { text: "Nitrogen", correct: true }, { text: "Hydrogen", correct: false }] },
+                    { question: "The process of water turning into water vapor is called: (6-1)", answers: [{ text: "Condensation", correct: false }, { text: "Evaporation", correct: true }, { text: "Precipitation", correct: false }, { text: "Freezing", correct: false }] },
+                    { question: "What type of rock is formed from the cooling and solidification of magma or lava? (6-1)", answers: [{ text: "Sedimentary", correct: false }, { text: "Metamorphic", correct: false }, { text: "Igneous", correct: true }, { text: "Fossilized", correct: false }] },
+                    { question: "What is the layer of Earth that we live on called? (6-1)", answers: [{ text: "Mantle", correct: false }, { text: "Outer Core", correct: false }, { text: "Crust", correct: true }, { text: "Inner Core", correct: false }] },
+                    { question: "Which celestial body is Earth's only natural satellite? (6-1)", answers: [{ text: "Mars", correct: false }, { text: "Venus", correct: false }, { text: "The Moon", correct: true }, { text: "The Sun", correct: false }] },
+                    { question: "What tool is used to measure wind speed? (6-1)", answers: [{ text: "Thermometer", correct: false }, { text: "Barometer", correct: false }, { text: "Anemometer", correct: true }, { text: "Hygrometer", correct: false }] },
+                    { question: "Clouds are primarily made of: (6-1)", answers: [{ text: "Dust particles", correct: false }, { text: "Smoke", correct: false }, { text: "Water droplets or ice crystals", correct: true }, { text: "Nitrogen gas", correct: false }] },
+                    { question: "The breaking down of rocks into smaller pieces is called: (6-1)", answers: [{ text: "Erosion", correct: false }, { text: "Weathering", correct: true }, { text: "Deposition", correct: false }, { text: "Compaction", correct: false }] },
+                    { question: "Which of these is a fossil fuel? (6-1)", answers: [{ text: "Wood", correct: false }, { text: "Solar energy", correct: false }, { text: "Coal", correct: true }, { text: "Wind energy", correct: false }] },
+                    { question: "The movement of weathered rock and soil from one place to another is called: (6-1)", answers: [{ text: "Weathering", correct: false }, { text: "Erosion", correct: true }, { text: "Subduction", correct: false }, { text: "Lithification", correct: false }] },
+                    { question: "What is the name for a large body of ice that moves slowly over land? (6-1)", answers: [{ text: "Lake", correct: false }, { text: "River", correct: false }, { text: "Glacier", correct: true }, { text: "Ocean", correct: false }] },
+                    { question: "The Earth completes one rotation on its axis approximately every: (6-1)", answers: [{ text: "365 days", correct: false }, { text: "30 days", correct: false }, { text: "24 hours", correct: true }, { text: "7 days", correct: false }] },
+                    { question: "What is the term for the path an object takes around another object in space? (6-1)", answers: [{ text: "Axis", correct: false }, { text: "Orbit", correct: true }, { text: "Trajectory", correct: false }, { text: "Rotation", correct: false }] },
+                    { question: "Which type of cloud is often associated with thunderstorms? (6-1)", answers: [{ text: "Cirrus", correct: false }, { text: "Stratus", correct: false }, { text: "Cumulonimbus", correct: true }, { text: "Cumulus", correct: false }] },
+                    { question: "What is the solid, outer part of the Earth called? (6-1)", answers: [{ text: "Atmosphere", correct: false }, { text: "Hydrosphere", correct: false }, { text: "Lithosphere", correct: true }, { text: "Biosphere", correct: false }] },
+                    { question: "The preserved remains or traces of ancient life are called: (6-1)", answers: [{ text: "Minerals", correct: false }, { text: "Rocks", correct: false }, { text: "Fossils", correct: true }, { text: "Sediments", correct: false }] },
+                    { question: "What is the Sun primarily made of? (6-1)", answers: [{ text: "Rock and iron", correct: false }, { text: "Liquid water and methane", correct: false }, { text: "Hydrogen and helium", correct: true }, { text: "Oxygen and nitrogen", correct: false }] },
+                    // New 5 for 6-1
+                    { question: "Which layer of the atmosphere is closest to Earth and where weather occurs? (6-1)", answers: [{ text: "Stratosphere", correct: false }, { text: "Troposphere", correct: true }, { text: "Mesosphere", correct: false }, { text: "Thermosphere", correct: false }] },
+                    { question: "What are small, rocky bodies that orbit the Sun, mostly found between Mars and Jupiter? (6-1)", answers: [{ text: "Comets", correct: false }, { text: "Asteroids", correct: true }, { text: "Moons", correct: false }, { text: "Dwarf planets", correct: false }] },
+                    { question: "What causes the Moon to appear to change shape (lunar phases)? (6-1)", answers: [{ text: "The Earth's shadow on the Moon", correct: false }, { text: "The changing amount of the sunlit side of the Moon facing Earth", correct: true }, { text: "Clouds covering the Moon", correct: false }, { text: "The Moon physically changing shape", correct: false }] },
+                    { question: "Which of these is a common metamorphic rock, often used in sculptures and buildings? (6-1)", answers: [{ text: "Sandstone", correct: false }, { text: "Marble", correct: true }, { text: "Granite", correct: false }, { text: "Shale", correct: false }] },
+                    { question: "The daily rise and fall of ocean water levels are called: (6-1)", answers: [{ text: "Currents", correct: false }, { text: "Tides", correct: true }, { text: "Waves", correct: false }, { text: "Tsunamis", correct: false }] }
+                ],
+                2: [ // Unit 2: Life Science (6th Grade) (20 original + 5 new = 25 total)
+                    { question: "What is the basic unit of structure and function in all living things? (6-2)", answers: [{ text: "Atom", correct: false }, { text: "Molecule", correct: false }, { text: "Cell", correct: true }, { text: "Organ", correct: false }] },
+                    { question: "Which part of a plant cell is responsible for photosynthesis? (6-2)", answers: [{ text: "Nucleus", correct: false }, { text: "Mitochondria", correct: false }, { text: "Chloroplast", correct: true }, { text: "Cell wall", correct: false }] },
+                    { question: "Organisms that make their own food are called: (6-2)", answers: [{ text: "Consumers", correct: false }, { text: "Decomposers", correct: false }, { text: "Producers", correct: true }, { text: "Herbivores", correct: false }] },
+                    { question: "Which of these is NOT a characteristic of all living things? (6-2)", answers: [{ text: "Growth and development", correct: false }, { text: "Ability to move from place to place", correct: true }, { text: "Response to stimuli", correct: false }, { text: "Reproduction", correct: false }] },
+                    { question: "What is the process by which plants release water vapor into the air? (6-2)", answers: [{ text: "Photosynthesis", correct: false }, { text: "Respiration", correct: false }, { text: "Transpiration", correct: true }, { text: "Condensation", correct: false }] },
+                    { question: "A group of similar cells working together to perform a specific function is called a(n): (6-2)", answers: [{ text: "Organ", correct: false }, { text: "Organ system", correct: false }, { text: "Tissue", correct: true }, { text: "Organism", correct: false }] },
+                    { question: "Which human body system is responsible for breaking down food? (6-2)", answers: [{ text: "Circulatory", correct: false }, { text: "Respiratory", correct: false }, { text: "Digestive", correct: true }, { text: "Nervous", correct: false }] },
+                    { question: "What is the main function of roots in a plant? (6-2)", answers: [{ text: "To make food", correct: false }, { text: "To absorb water and nutrients", correct: true }, { text: "To produce seeds", correct: false }, { text: "To release oxygen", correct: false }] },
+                    { question: "An animal that eats only plants is called a(n): (6-2)", answers: [{ text: "Carnivore", correct: false }, { text: "Omnivore", correct: false }, { text: "Herbivore", correct: true }, { text: "Decomposer", correct: false }] },
+                    { question: "What part of an animal cell controls what enters and leaves the cell? (6-2)", answers: [{ text: "Nucleus", correct: false }, { text: "Cytoplasm", correct: false }, { text: "Cell membrane", correct: true }, { text: "Mitochondria", correct: false }] },
+                    { question: "The transfer of energy from one organism to another in an ecosystem is shown by a: (6-2)", answers: [{ text: "Water cycle", correct: false }, { text: "Food chain", correct: true }, { text: "Rock cycle", correct: false }, { text: "Life cycle", correct: false }] },
+                    { question: "A feature or behavior that helps an organism survive in its environment is called: (6-2)", answers: [{ text: "A habitat", correct: false }, { text: "An adaptation", correct: true }, { text: "A population", correct: false }, { text: "A community", correct: false }] },
+                    { question: "Which of these is an example of a vertebrate animal? (6-2)", answers: [{ text: "Worm", correct: false }, { text: "Jellyfish", correct: false }, { text: "Fish", correct: true }, { text: "Insect", correct: false }] },
+                    { question: "What gas do plants take in from the atmosphere for photosynthesis? (6-2)", answers: [{ text: "Oxygen", correct: false }, { text: "Nitrogen", correct: false }, { text: "Carbon Dioxide", correct: true }, { text: "Hydrogen", correct: false }] },
+                    { question: "The 'powerhouses' of the cell, responsible for generating energy, are the: (6-2)", answers: [{ text: "Ribosomes", correct: false }, { text: "Nucleus", correct: false }, { text: "Mitochondria", correct: true }, { text: "Vacuoles", correct: false }] },
+                    { question: "All the living and non-living things interacting in a particular area make up a(n): (6-2)", answers: [{ text: "Population", correct: false }, { text: "Community", correct: false }, { text: "Ecosystem", correct: true }, { text: "Biome", correct: false }] },
+                    { question: "Which of these provides structural support to a plant cell but is NOT found in animal cells? (6-2)", answers: [{ text: "Cell membrane", correct: false }, { text: "Cytoplasm", correct: false }, { text: "Cell wall", correct: true }, { text: "Nucleus", correct: false }] },
+                    { question: "What is the primary role of decomposers like bacteria and fungi in an ecosystem? (6-2)", answers: [{ text: "To produce food", correct: false }, { text: "To eat producers", correct: false }, { text: "To break down dead organisms", correct: true }, { text: "To control animal populations", correct: false }] },
+                    { question: "The process by which organisms make more of their own kind is called: (6-2)", answers: [{ text: "Growth", correct: false }, { text: "Metabolism", correct: false }, { text: "Reproduction", correct: true }, { text: "Respiration", correct: false }] },
+                    { question: "Which human body system transports oxygen and nutrients throughout the body? (6-2)", answers: [{ text: "Digestive System", correct: false }, { text: "Respiratory System", correct: false }, { text: "Circulatory System", correct: true }, { text: "Skeletal System", correct: false }] },
+                    // New 5 for 6-2
+                    { question: "Which of the following is an example of an inherited trait in humans? (6-2)", answers: [{ text: "Favorite color", correct: false }, { text: "Eye color", correct: true }, { text: "Ability to ride a bike", correct: false }, { text: "Hairstyle", correct: false }] },
+                    { question: "What part of a flower produces pollen? (6-2)", answers: [{ text: "Petal", correct: false }, { text: "Stamen (anther)", correct: true }, { text: "Pistil (stigma)", correct: false }, { text: "Sepal", correct: false }] },
+                    { question: "Which of these is a characteristic of mammals? (6-2)", answers: [{ text: "They lay eggs", correct: false }, { text: "They have feathers", correct: false }, { text: "They feed milk to their young and have fur/hair", correct: true }, { text: "They are cold-blooded", correct: false }] },
+                    { question: "A mushroom belongs to which kingdom of life? (6-2)", answers: [{ text: "Plant", correct: false }, { text: "Animal", correct: false }, { text: "Fungi", correct: true }, { text: "Protist", correct: false }] },
+                    { question: "In a simple food chain, if a grasshopper eats grass, and a frog eats the grasshopper, the frog is a: (6-2)", answers: [{ text: "Producer", correct: false }, { text: "Primary consumer", correct: false }, { text: "Secondary consumer", correct: true }, { text: "Decomposer", correct: false }] }
+                ],
+                3: [ // Unit 3: Physical Science (6th Grade) (20 original + 5 new = 25 total)
+                    { question: "What are the three common states of matter? (6-3)", answers: [{ text: "Solid, Liquid, Gas", correct: true }, { text: "Atom, Molecule, Compound", correct: false }, { text: "Energy, Force, Motion", correct: false }, { text: "Heat, Light, Sound", correct: false }] },
+                    { question: "The ability to do work or cause change is called: (6-3)", answers: [{ text: "Force", correct: false }, { text: "Matter", correct: false }, { text: "Energy", correct: true }, { text: "Friction", correct: false }] },
+                    { question: "A push or a pull on an object is known as: (6-3)", answers: [{ text: "Inertia", correct: false }, { text: "Gravity", correct: false }, { text: "Force", correct: true }, { text: "Mass", correct: false }] },
+                    { question: "The energy of motion is called: (6-3)", answers: [{ text: "Potential energy", correct: false }, { text: "Chemical energy", correct: false }, { text: "Kinetic energy", correct: true }, { text: "Thermal energy", correct: false }] },
+                    { question: "Which of these is an example of a simple machine? (6-3)", answers: [{ text: "A car", correct: false }, { text: "A computer", correct: false }, { text: "A lever (like a seesaw)", correct: true }, { text: "A bicycle", correct: false }] },
+                    { question: "The force that pulls objects towards the center of the Earth is: (6-3)", answers: [{ text: "Magnetism", correct: false }, { text: "Friction", correct: false }, { text: "Gravity", correct: true }, { text: "Tension", correct: false }] },
+                    { question: "What happens to water when it freezes? (6-3)", answers: [{ text: "It turns into a gas", correct: false }, { text: "It turns into a solid", correct: true }, { text: "It disappears", correct: false }, { text: "It boils", correct: false }] },
+                    { question: "Energy stored in an object due to its position or condition is: (6-3)", answers: [{ text: "Kinetic energy", correct: false }, { text: "Potential energy", correct: true }, { text: "Sound energy", correct: false }, { text: "Light energy", correct: false }] },
+                    { question: "Which of these is a good conductor of electricity? (6-3)", answers: [{ text: "Rubber", correct: false }, { text: "Wood", correct: false }, { text: "Copper (metal)", correct: true }, { text: "Glass", correct: false }] },
+                    { question: "The measure of the amount of matter in an object is its: (6-3)", answers: [{ text: "Weight", correct: false }, { text: "Volume", correct: false }, { text: "Mass", correct: true }, { text: "Density", correct: false }] },
+                    { question: "Light is a form of: (6-3)", answers: [{ text: "Matter", correct: false }, { text: "Force", correct: false }, { text: "Energy", correct: true }, { text: "Friction", correct: false }] },
+                    { question: "A force that opposes motion when two surfaces rub against each other is: (6-3)", answers: [{ text: "Gravity", correct: false }, { text: "Magnetism", correct: false }, { text: "Friction", correct: true }, { text: "Buoyancy", correct: false }] },
+                    { question: "Which simple machine is a sloping surface, like a ramp? (6-3)", answers: [{ text: "Lever", correct: false }, { text: "Pulley", correct: false }, { text: "Inclined plane", correct: true }, { text: "Wheel and axle", correct: false }] },
+                    { question: "Sound is caused by: (6-3)", answers: [{ text: "Light", correct: false }, { text: "Heat", correct: false }, { text: "Vibrations", correct: true }, { text: "Silence", correct: false }] },
+                    { question: "What unit is commonly used to measure temperature? (6-3)", answers: [{ text: "Meters", correct: false }, { text: "Grams", correct: false }, { text: "Degrees Celsius (or Fahrenheit)", correct: true }, { text: "Liters", correct: false }] },
+                    { question: "The energy stored in food or fuel is a type of: (6-3)", answers: [{ text: "Kinetic energy", correct: false }, { text: "Mechanical energy", correct: false }, { text: "Chemical energy", correct: true }, { text: "Nuclear energy", correct: false }] },
+                    { question: "When light bounces off a shiny surface, it is called: (6-3)", answers: [{ text: "Refraction", correct: false }, { text: "Absorption", correct: false }, { text: "Reflection", correct: true }, { text: "Diffraction", correct: false }] },
+                    { question: "What is the smallest particle of an element that still has the properties of that element? (6-3)", answers: [{ text: "Molecule", correct: false }, { text: "Compound", correct: false }, { text: "Atom", correct: true }, { text: "Cell", correct: false }] },
+                    { question: "Heat energy moves from a warmer object to a: (6-3)", answers: [{ text: "Warmer object", correct: false }, { text: "Cooler object", correct: true }, { text: "Object of the same temperature", correct: false }, { text: "It does not move", correct: false }] },
+                    { question: "A material that does NOT allow electricity to pass through it easily is called an: (6-3)", answers: [{ text: "Conductor", correct: false }, { text: "Semiconductor", correct: false }, { text: "Insulator", correct: true }, { text: "Resistor", correct: false }] },
+                    // New 5 for 6-3
+                    { question: "The amount of space an object takes up is its: (6-3)", answers: [{ text: "Mass", correct: false }, { text: "Volume", correct: true }, { text: "Density", correct: false }, { text: "Weight", correct: false }] },
+                    { question: "Which of these is an example of a chemical change? (6-3)", answers: [{ text: "Melting ice", correct: false }, { text: "Burning wood", correct: true }, { text: "Tearing paper", correct: false }, { text: "Dissolving sugar in water", correct: false }] },
+                    { question: "What type of energy is produced by the Sun? (6-3)", answers: [{ text: "Chemical energy", correct: false }, { text: "Radiant energy (light and heat)", correct: true }, { text: "Mechanical energy", correct: false }, { text: "Nuclear energy (in its core, then radiant)", correct: false }] },
+                    { question: "What tool would you use to measure the length of a pencil? (6-3)", answers: [{ text: "Balance scale", correct: false }, { text: "Ruler", correct: true }, { text: "Graduated cylinder", correct: false }, { text: "Thermometer", correct: false }] },
+                    { question: "When light bends as it passes from air to water, this is called: (6-3)", answers: [{ text: "Reflection", correct: false }, { text: "Refraction", correct: true }, { text: "Absorption", correct: false }, { text: "Diffraction", correct: false }] }
+                ]
+            },
+            7: { // Grade 7: Cells & Heredity, Human Body Systems, Ecology & Environment, Chemistry & Physics
+                1: [ // Unit 1: Cells & Heredity (20 original + 5 new = 25 total)
+                    { question: "Which organelle is known as the 'powerhouse' of the cell, generating ATP? (7-1)", answers: [{ text: "Nucleus", correct: false }, { text: "Ribosome", correct: false }, { text: "Mitochondria", correct: true }, { text: "Chloroplast", correct: false }] },
+                    { question: "What is the primary function of DNA? (7-1)", answers: [{ text: "To produce energy", correct: false }, { text: "To store and transmit genetic information", correct: true }, { text: "To break down waste materials", correct: false }, { text: "To control cell movement", correct: false }] },
+                    { question: "The process of cell division that results in two identical daughter cells is: (7-1)", answers: [{ text: "Meiosis", correct: false }, { text: "Mitosis", correct: true }, { text: "Fertilization", correct: false }, { text: "Osmosis", correct: false }] },
+                    { question: "Which of these is a characteristic of plant cells but NOT animal cells? (7-1)", answers: [{ text: "Cell membrane", correct: false }, { text: "Nucleus", correct: false }, { text: "Cell wall and chloroplasts", correct: true }, { text: "Cytoplasm", correct: false }] },
+                    { question: "A segment of DNA that codes for a specific trait is called a: (7-1)", answers: [{ text: "Chromosome", correct: false }, { text: "Gene", correct: true }, { text: "Allele", correct: false }, { text: "Protein", correct: false }] },
+                    { question: "What are the building blocks of proteins? (7-1)", answers: [{ text: "Nucleotides", correct: false }, { text: "Amino acids", correct: true }, { text: "Monosaccharides", correct: false }, { text: "Fatty acids", correct: false }] },
+                    { question: "If 'B' represents the allele for brown eyes and 'b' for blue eyes, what is the genotype of a heterozygous individual? (7-1)", answers: [{ text: "BB", correct: false }, { text: "Bb", correct: true }, { text: "bb", correct: false }, { text: "Brown", correct: false }] },
+                    { question: "Which organelle is responsible for protein synthesis? (7-1)", answers: [{ text: "Golgi apparatus", correct: false }, { text: "Lysosome", correct: false }, { text: "Ribosome", correct: true }, { text: "Endoplasmic reticulum", correct: false }] },
+                    { question: "The passing of traits from parents to offspring is known as: (7-1)", answers: [{ text: "Evolution", correct: false }, { text: "Heredity", correct: true }, { text: "Metabolism", correct: false }, { text: "Adaptation", correct: false }] },
+                    { question: "What is the shape of a DNA molecule often described as? (7-1)", answers: [{ text: "Single strand", correct: false }, { text: "Double helix", correct: true }, { text: "Triple sphere", correct: false }, { text: "Linear chain", correct: false }] },
+                    { question: "The diffusion of water across a selectively permeable membrane is called: (7-1)", answers: [{ text: "Active transport", correct: false }, { text: "Osmosis", correct: true }, { text: "Endocytosis", correct: false }, { text: "Facilitated diffusion", correct: false }] },
+                    { question: "How many chromosomes do humans typically have in each somatic (body) cell? (7-1)", answers: [{ text: "23", correct: false }, { text: "46", correct: true }, { text: "64", correct: false }, { text: "12", correct: false }] },
+                    { question: "An organism's observable characteristics are its: (7-1)", answers: [{ text: "Genotype", correct: false }, { text: "Phenotype", correct: true }, { text: "Alleles", correct: false }, { text: "Chromosomes", correct: false }] },
+                    { question: "What is the function of the cell membrane? (7-1)", answers: [{ text: "To provide rigid support", correct: false }, { text: "To control what enters and exits the cell", correct: true }, { text: "To produce energy", correct: false }, { text: "To store DNA", correct: false }] },
+                    { question: "Which process produces gametes (sex cells) with half the number of chromosomes? (7-1)", answers: [{ text: "Mitosis", correct: false }, { text: "Meiosis", correct: true }, { text: "Binary fission", correct: false }, { text: "Budding", correct: false }] },
+                    { question: "A Punnett square is used to predict the: (7-1)", answers: [{ text: "Age of an organism", correct: false }, { text: "Possible genetic outcomes of a cross", correct: true }, { text: "Rate of cell division", correct: false }, { text: "Number of mitochondria in a cell", correct: false }] },
+                    { question: "What is the gel-like substance that fills the cell and surrounds the organelles? (7-1)", answers: [{ text: "Nucleoplasm", correct: false }, { text: "Cytoplasm", correct: true }, { text: "Matrix", correct: false }, { text: "Stroma", correct: false }] },
+                    { question: "Different forms of the same gene are called: (7-1)", answers: [{ text: "Chromatids", correct: false }, { text: "Alleles", correct: true }, { text: "Genomes", correct: false }, { text: "Mutations", correct: false }] },
+                    { question: "Which scientist is known as the 'father of genetics' for his work with pea plants? (7-1)", answers: [{ text: "Charles Darwin", correct: false }, { text: "Gregor Mendel", correct: true }, { text: "James Watson", correct: false }, { text: "Louis Pasteur", correct: false }] },
+                    { question: "A mutation is a change in an organism's: (7-1)", answers: [{ text: "Diet", correct: false }, { text: "DNA sequence", correct: true }, { text: "Habitat", correct: false }, { text: "Behavior", correct: false }] },
+                    // New 5 for 7-1
+                    { question: "Which type of cell lacks a true nucleus and membrane-bound organelles? (7-1)", answers: [{ text: "Eukaryotic cell", correct: false }, { text: "Prokaryotic cell (e.g., bacteria)", correct: true }, { text: "Plant cell", correct: false }, { text: "Animal cell", correct: false }] },
+                    { question: "What is the correct order of levels of organization in a multicellular organism, from simplest to most complex? (7-1)", answers: [{ text: "Organ, Tissue, Cell, System", correct: false }, { text: "Cell, Tissue, Organ, Organ System", correct: true }, { text: "Tissue, Cell, System, Organ", correct: false }, { text: "System, Organ, Cell, Tissue", correct: false }] },
+                    { question: "If a parent has a genotype of 'Aa' for a trait, what percentage of their gametes will carry the 'a' allele? (7-1)", answers: [{ text: "25%", correct: false }, { text: "50%", correct: true }, { text: "75%", correct: false }, { text: "100%", correct: false }] },
+                    { question: "Which organelle in a plant cell stores water, nutrients, and waste products, often being very large? (7-1)", answers: [{ text: "Mitochondrion", correct: false }, { text: "Central Vacuole", correct: true }, { text: "Chloroplast", correct: false }, { text: "Nucleus", correct: false }] },
+                    { question: "Asexual reproduction involves: (7-1)", answers: [{ text: "Two parents and genetic variation", correct: false }, { text: "One parent and offspring identical to the parent", correct: true }, { text: "Fertilization of an egg by sperm", correct: false }, { text: "Only occurs in plants", correct: false }] }
+                ],
+                2: [ // Unit 2: Human Body Systems (20 original + 5 new = 25 total)
+                    { question: "Which body system is responsible for transporting oxygen, nutrients, and waste throughout the body? (7-2)", answers: [{ text: "Respiratory System", correct: false }, { text: "Circulatory System", correct: true }, { text: "Digestive System", correct: false }, { text: "Nervous System", correct: false }] },
+                    { question: "What is the main function of the respiratory system? (7-2)", answers: [{ text: "To break down food", correct: false }, { text: "To exchange gases (oxygen and carbon dioxide)", correct: true }, { text: "To pump blood", correct: false }, { text: "To provide structural support", correct: false }] },
+                    { question: "The brain and spinal cord are the main components of which system? (7-2)", answers: [{ text: "Endocrine System", correct: false }, { text: "Nervous System", correct: true }, { text: "Skeletal System", correct: false }, { text: "Muscular System", correct: false }] },
+                    { question: "Which organ is primarily responsible for pumping blood? (7-2)", answers: [{ text: "Lungs", correct: false }, { text: "Heart", correct: true }, { text: "Stomach", correct: false }, { text: "Liver", correct: false }] },
+                    { question: "What is the primary role of the skeletal system? (7-2)", answers: [{ text: "To produce hormones", correct: false }, { text: "To provide support, protection, and allow movement", correct: true }, { text: "To digest food", correct: false }, { text: "To filter waste from blood", correct: false }] },
+                    { question: "Muscles work with the skeletal system to produce: (7-2)", answers: [{ text: "Blood cells", correct: false }, { text: "Movement", correct: true }, { text: "Hormones", correct: false }, { text: "Digestive enzymes", correct: false }] },
+                    { question: "Which system breaks down food into smaller molecules that the body can absorb? (7-2)", answers: [{ text: "Excretory System", correct: false }, { text: "Digestive System", correct: true }, { text: "Immune System", correct: false }, { text: "Integumentary System", correct: false }] },
+                    { question: "What are the tiny air sacs in the lungs where gas exchange occurs? (7-2)", answers: [{ text: "Bronchioles", correct: false }, { text: "Alveoli", correct: true }, { text: "Capillaries", correct: false }, { text: "Nephrons", correct: false }] },
+                    { question: "Which system defends the body against pathogens like bacteria and viruses? (7-2)", answers: [{ text: "Nervous System", correct: false }, { text: "Immune System", correct: true }, { text: "Endocrine System", correct: false }, { text: "Reproductive System", correct: false }] },
+                    { question: "Hormones are chemical messengers produced by which system? (7-2)", answers: [{ text: "Skeletal System", correct: false }, { text: "Endocrine System", correct: true }, { text: "Lymphatic System", correct: false }, { text: "Muscular System", correct: false }] },
+                    { question: "What is the largest organ of the human body, part of the integumentary system? (7-2)", answers: [{ text: "Liver", correct: false }, { text: "Skin", correct: true }, { text: "Brain", correct: false }, { text: "Lungs", correct: false }] },
+                    { question: "The kidneys are the main organs of which system, responsible for filtering waste from blood? (7-2)", answers: [{ text: "Digestive System", correct: false }, { text: "Excretory (Urinary) System", correct: true }, { text: "Circulatory System", correct: false }, { text: "Respiratory System", correct: false }] },
+                    { question: "What type of blood vessel carries blood away from the heart? (7-2)", answers: [{ text: "Vein", correct: false }, { text: "Artery", correct: true }, { text: "Capillary", correct: false }, { text: "Lymphatic vessel", correct: false }] },
+                    { question: "The wave-like muscular contractions that move food through the digestive tract are called: (7-2)", answers: [{ text: "Diffusion", correct: false }, { text: "Peristalsis", correct: true }, { text: "Osmosis", correct: false }, { text: "Respiration", correct: false }] },
+                    { question: "Which part of the nervous system controls voluntary actions like walking? (7-2)", answers: [{ text: "Autonomic nervous system", correct: false }, { text: "Somatic nervous system", correct: true }, { text: "Sympathetic nervous system", correct: false }, { text: "Parasympathetic nervous system", correct: false }] },
+                    { question: "Red blood cells are primarily responsible for transporting: (7-2)", answers: [{ text: "Waste products", correct: false }, { text: "Oxygen", correct: true }, { text: "Hormones", correct: false }, { text: "Antibodies", correct: false }] },
+                    { question: "Where does most of the chemical digestion and absorption of nutrients take place? (7-2)", answers: [{ text: "Stomach", correct: false }, { text: "Small intestine", correct: true }, { text: "Large intestine", correct: false }, { text: "Esophagus", correct: false }] },
+                    { question: "What is the name of the body's response to injury or infection, characterized by redness, swelling, heat, and pain? (7-2)", answers: [{ text: "Allergy", correct: false }, { text: "Inflammation", correct: true }, { text: "Vaccination", correct: false }, { text: "Digestion", correct: false }] },
+                    { question: "Which gland is often called the 'master gland' as it influences many other endocrine glands? (7-2)", answers: [{ text: "Thyroid", correct: false }, { text: "Pituitary", correct: true }, { text: "Adrenal", correct: false }, { text: "Pancreas", correct: false }] },
+                    { question: "What provides the framework for the body and protects internal organs? (7-2)", answers: [{ text: "Muscles", correct: false }, { text: "Skeleton", correct: true }, { text: "Skin", correct: false }, { text: "Nerves", correct: false }] },
+                    // New 5 for 7-2
+                    { question: "Which component of blood is primarily responsible for fighting infection? (7-2)", answers: [{ text: "Red blood cells", correct: false }, { text: "White blood cells", correct: true }, { text: "Platelets", correct: false }, { text: "Plasma", correct: false }] },
+                    { question: "The pancreas plays a role in which two body systems? (7-2)", answers: [{ text: "Nervous and Skeletal", correct: false }, { text: "Digestive and Endocrine", correct: true }, { text: "Respiratory and Circulatory", correct: false }, { text: "Muscular and Integumentary", correct: false }] },
+                    { question: "What is the term for the body's ability to maintain a stable internal environment? (7-2)", answers: [{ text: "Metabolism", correct: false }, { text: "Homeostasis", correct: true }, { text: "Respiration", correct: false }, { text: "Adaptation", correct: false }] },
+                    { question: "Which type of joint allows for movement in only one direction, like a knee or elbow? (7-2)", answers: [{ text: "Ball-and-socket joint", correct: false }, { text: "Hinge joint", correct: true }, { text: "Pivot joint", correct: false }, { text: "Gliding joint", correct: false }] },
+                    { question: "What is the main function of the diaphragm in the respiratory system? (7-2)", answers: [{ text: "To filter air", correct: false }, { text: "To control breathing by contracting and relaxing", correct: true }, { text: "To produce mucus", correct: false }, { text: "To warm incoming air", correct: false }] }
+                ],
+                3: [ // Unit 3: Ecology & Environment (20 original + 5 new = 25 total)
+                    { question: "All the living and nonliving things interacting in a particular area form a(n): (7-3)", answers: [{ text: "Population", correct: false }, { text: "Ecosystem", correct: true }, { text: "Community", correct: false }, { text: "Biome", correct: false }] },
+                    { question: "An organism that makes its own food (e.g., a plant) is called a: (7-3)", answers: [{ text: "Consumer", correct: false }, { text: "Producer", correct: true }, { text: "Decomposer", correct: false }, { text: "Herbivore", correct: false }] },
+                    { question: "A food web is different from a food chain because it shows: (7-3)", answers: [{ text: "Only one path of energy flow", correct: false }, { text: "Multiple interconnected paths of energy flow", correct: true }, { text: "Only producers and consumers", correct: false }, { text: "Only decomposers", correct: false }] },
+                    { question: "Which of these is an example of an abiotic factor in an ecosystem? (7-3)", answers: [{ text: "Trees", correct: false }, { text: "Sunlight", correct: true }, { text: "Insects", correct: false }, { text: "Fungi", correct: false }] },
+                    { question: "The role or 'job' an organism has in its environment is its: (7-3)", answers: [{ text: "Habitat", correct: false }, { text: "Niche", correct: true }, { text: "Population", correct: false }, { text: "Community", correct: false }] },
+                    { question: "A relationship between two species where both benefit is called: (7-3)", answers: [{ text: "Parasitism", correct: false }, { text: "Mutualism", correct: true }, { text: "Commensalism", correct: false }, { text: "Predation", correct: false }] },
+                    { question: "Which biome is characterized by very cold temperatures, little precipitation, and permafrost? (7-3)", answers: [{ text: "Desert", correct: false }, { text: "Tundra", correct: true }, { text: "Rainforest", correct: false }, { text: "Grassland", correct: false }] },
+                    { question: "The process by which water cycles through the Earth and atmosphere is the: (7-3)", answers: [{ text: "Carbon cycle", correct: false }, { text: "Water cycle", correct: true }, { text: "Nitrogen cycle", correct: false }, { text: "Rock cycle", correct: false }] },
+                    { question: "What is the primary cause of the greenhouse effect? (7-3)", answers: [{ text: "Ozone layer depletion", correct: false }, { text: "Certain gases in the atmosphere trapping heat", correct: true }, { text: "Acid rain", correct: false }, { text: "Deforestation only", correct: false }] },
+                    { question: "An organism that eats both plants and animals is a(n): (7-3)", answers: [{ text: "Herbivore", correct: false }, { text: "Omnivore", correct: true }, { text: "Carnivore", correct: false }, { text: "Producer", correct: false }] },
+                    { question: "The variety of life in a particular habitat or ecosystem is known as: (7-3)", answers: [{ text: "Succession", correct: false }, { text: "Biodiversity", correct: true }, { text: "Carrying capacity", correct: false }, { text: "Competition", correct: false }] },
+                    { question: "Which of these is a renewable resource? (7-3)", answers: [{ text: "Coal", correct: false }, { text: "Wind energy", correct: true }, { text: "Natural gas", correct: false }, { text: "Petroleum", correct: false }] },
+                    { question: "The gradual process of change in an ecosystem over time is called: (7-3)", answers: [{ text: "Evolution", correct: false }, { text: "Ecological succession", correct: true }, { text: "Symbiosis", correct: false }, { text: "Nitrification", correct: false }] },
+                    { question: "What is the term for the maximum population size an environment can sustain? (7-3)", answers: [{ text: "Niche limit", correct: false }, { text: "Carrying capacity", correct: true }, { text: "Biodiversity index", correct: false }, { text: "Limiting factor", correct: false }] },
+                    { question: "Deforestation primarily leads to: (7-3)", answers: [{ text: "Increased air quality", correct: false }, { text: "Habitat loss and soil erosion", correct: true }, { text: "Stronger ozone layer", correct: false }, { text: "More groundwater", correct: false }] },
+                    { question: "Organisms that break down dead organic matter are called: (7-3)", answers: [{ text: "Predators", correct: false }, { text: "Decomposers", correct: true }, { text: "Producers", correct: false }, { text: "Parasites", correct: false }] },
+                    { question: "The burning of fossil fuels releases large amounts of which greenhouse gas? (7-3)", answers: [{ text: "Oxygen", correct: false }, { text: "Carbon dioxide", correct: true }, { text: "Nitrogen", correct: false }, { text: "Helium", correct: false }] },
+                    { question: "A species that is not native to an ecosystem and causes harm is an: (7-3)", answers: [{ text: "Endemic species", correct: false }, { text: "Invasive species", correct: true }, { text: "Keystone species", correct: false }, { text: "Indicator species", correct: false }] },
+                    { question: "What is the main source of energy for most ecosystems on Earth? (7-3)", answers: [{ text: "Geothermal heat", correct: false }, { text: "The Sun", correct: true }, { text: "Chemical reactions", correct: false }, { text: "Moonlight", correct: false }] },
+                    { question: "Conservation efforts aim to: (7-3)", answers: [{ text: "Increase pollution", correct: false }, { text: "Protect and preserve natural resources and biodiversity", correct: true }, { text: "Promote deforestation", correct: false }, { text: "Use up resources faster", correct: false }] },
+                    // New 5 for 7-3
+                    { question: "What is the term for an organism that is hunted and eaten by another organism? (7-3)", answers: [{ text: "Predator", correct: false }, { text: "Prey", correct: true }, { text: "Producer", correct: false }, { text: "Decomposer", correct: false }] },
+                    { question: "In an energy pyramid, approximately what percentage of energy is transferred from one trophic level to the next? (7-3)", answers: [{ text: "5%", correct: false }, { text: "10%", correct: true }, { text: "50%", correct: false }, { text: "90%", correct: false }] },
+                    { question: "A symbiotic relationship where one organism benefits and the other is unaffected is called: (7-3)", answers: [{ text: "Mutualism", correct: false }, { text: "Commensalism", correct: true }, { text: "Parasitism", correct: false }, { text: "Competition", correct: false }] },
+                    { question: "Which of the following is a major contributor to ozone layer depletion? (7-3)", answers: [{ text: "Carbon dioxide", correct: false }, { text: "Chlorofluorocarbons (CFCs)", correct: true }, { text: "Methane", correct: false }, { text: "Water vapor", correct: false }] },
+                    { question: "The process of converting atmospheric nitrogen into a form usable by plants is called: (7-3)", answers: [{ text: "Denitrification", correct: false }, { text: "Nitrogen fixation", correct: true }, { text: "Photosynthesis", correct: false }, { text: "Respiration", correct: false }] }
+                ],
+                4: [ // Unit 4: Chemistry & Physics (20 original + 5 new = 25 total)
+                    { question: "What is the smallest particle of an element that retains the chemical identity of that element? (7-4)", answers: [{ text: "Molecule", correct: false }, { text: "Atom", correct: true }, { text: "Compound", correct: false }, { text: "Electron", correct: false }] },
+                    { question: "The central part of an atom, containing protons and neutrons, is the: (7-4)", answers: [{ text: "Electron cloud", correct: false }, { text: "Nucleus", correct: true }, { text: "Orbital", correct: false }, { text: "Shell", correct: false }] },
+                    { question: "A substance made of two or more different elements chemically combined is a(n): (7-4)", answers: [{ text: "Mixture", correct: false }, { text: "Compound", correct: true }, { text: "Element", correct: false }, { text: "Solution", correct: false }] },
+                    { question: "What does the chemical formula H₂O represent? (7-4)", answers: [{ text: "Hydrogen peroxide", correct: false }, { text: "Water", correct: true }, { text: "Carbon dioxide", correct: false }, { text: "Methane", correct: false }] },
+                    { question: "A change in matter that produces one or more new substances is a: (7-4)", answers: [{ text: "Physical change", correct: false }, { text: "Chemical change (reaction)", correct: true }, { text: "State change", correct: false }, { text: "Phase transition", correct: false }] },
+                    { question: "The ability of a substance to dissolve in another substance is called: (7-4)", answers: [{ text: "Density", correct: false }, { text: "Solubility", correct: true }, { text: "Viscosity", correct: false }, { text: "Malleability", correct: false }] },
+                    { question: "A force is a: (7-4)", answers: [{ text: "Form of energy", correct: false }, { text: "Push or a pull", correct: true }, { text: "Property of matter", correct: false }, { text: "Rate of motion", correct: false }] },
+                    { question: "The energy of motion is called: (7-4)", answers: [{ text: "Potential energy", correct: false }, { text: "Kinetic energy", correct: true }, { text: "Chemical energy", correct: false }, { text: "Thermal energy", correct: false }] },
+                    { question: "Newton's First Law of Motion states that an object at rest stays at rest and an object in motion stays in motion unless acted upon by a(n): (7-4)", answers: [{ text: "Equal force", correct: false }, { text: "Unbalanced force", correct: true }, { text: "Balanced force", correct: false }, { text: "Gravitational force only", correct: false }] },
+                    { question: "The transfer of heat through the movement of fluids (liquids or gases) is: (7-4)", answers: [{ text: "Conduction", correct: false }, { text: "Convection", correct: true }, { text: "Radiation", correct: false }, { text: "Insulation", correct: false }] },
+                    { question: "What is the unit of measurement for force? (7-4)", answers: [{ text: "Joule", correct: false }, { text: "Newton", correct: true }, { text: "Watt", correct: false }, { text: "Meter per second", correct: false }] },
+                    { question: "Light is a form of energy that travels in: (7-4)", answers: [{ text: "Particles only", correct: false }, { text: "Waves", correct: true }, { text: "Currents", correct: false }, { text: "Fields only", correct: false }] },
+                    { question: "The subatomic particle with a negative charge is the: (7-4)", answers: [{ text: "Proton", correct: false }, { text: "Electron", correct: true }, { text: "Neutron", correct: false }, { text: "Photon", correct: false }] },
+                    { question: "The periodic table organizes elements based on their: (7-4)", answers: [{ text: "Discovery date", correct: false }, { text: "Atomic number", correct: true }, { text: "Abundance on Earth", correct: false }, { text: "Density", correct: false }] },
+                    { question: "Which of these is an example of a physical change? (7-4)", answers: [{ text: "Burning wood", correct: false }, { text: "Melting ice", correct: true }, { text: "Rusting iron", correct: false }, { text: "Baking a cake", correct: false }] },
+                    { question: "The law of conservation of energy states that energy: (7-4)", answers: [{ text: "Can be created but not destroyed", correct: false }, { text: "Cannot be created or destroyed, only transformed", correct: true }, { text: "Is always lost as heat", correct: false }, { text: "Only exists as kinetic energy", correct: false }] },
+                    { question: "Sound waves require a ____________ to travel through. (7-4)", answers: [{ text: "Vacuum", correct: false }, { text: "Medium (solid, liquid, or gas)", correct: true }, { text: "Light source", correct: false }, { text: "Magnetic field", correct: false }] },
+                    { question: "The resistance of an object to a change in its state of motion is called: (7-4)", answers: [{ text: "Acceleration", correct: false }, { text: "Inertia", correct: true }, { text: "Friction", correct: false }, { text: "Velocity", correct: false }] },
+                    { question: "What type of energy is stored in a battery? (7-4)", answers: [{ text: "Mechanical energy", correct: false }, { text: "Chemical energy", correct: true }, { text: "Nuclear energy", correct: false }, { text: "Radiant energy", correct: false }] },
+                    { question: "The bending of light as it passes from one medium to another is called: (7-4)", answers: [{ text: "Reflection", correct: false }, { text: "Refraction", correct: true }, { text: "Absorption", correct: false }, { text: "Diffraction", correct: false }] },
+                    // New 5 for 7-4
+                    { question: "The atomic mass of an element is approximately equal to the number of: (7-4)", answers: [{ text: "Protons only", correct: false }, { text: "Protons and neutrons", correct: true }, { text: "Electrons only", correct: false }, { text: "Neutrons and electrons", correct: false }] },
+                    { question: "Elements in the same vertical column (group) of the periodic table usually have similar: (7-4)", answers: [{ text: "Atomic masses", correct: false }, { text: "Chemical properties", correct: true }, { text: "Numbers of protons", correct: false }, { text: "Numbers of electron shells", correct: false }] },
+                    { question: "In the chemical equation 2H₂ + O₂ → 2H₂O, H₂ and O₂ are the: (7-4)", answers: [{ text: "Products", correct: false }, { text: "Reactants", correct: true }, { text: "Catalysts", correct: false }, { text: "Coefficients", correct: false }] },
+                    { question: "Which of Newton's Laws explains why you feel pushed back in your seat when a car accelerates forward? (7-4)", answers: [{ text: "First Law (Inertia)", correct: true }, { text: "Second Law (F=ma)", correct: false }, { text: "Third Law (Action-Reaction)", correct: false }, { text: "Law of Gravitation", correct: false }] },
+                    { question: "Which type of electromagnetic wave has the highest energy and shortest wavelength? (7-4)", answers: [{ text: "Radio waves", correct: false }, { text: "Gamma rays", correct: true }, { text: "Infrared radiation", correct: false }, { text: "Visible light", correct: false }] }
+                ]
+            }
+        };
+
+
+        /**
+         * Renders the currently owned power-ups in the top-left container.
+         */
+        function renderPurchasedPowerups() {
+            purchasedPowerupsContainer.innerHTML = '';
+            const powerupsData = [
+                { id: 'fiftyFifty', name: '50/50', count: fiftyFiftyCount, description: 'Removes two incorrect answers.', iconSymbol: '½' },
+                { id: 'skip', name: 'Skip Question', count: skipCount, description: 'Skips the current question.', iconSymbol: '⏭️' },
+                { id: 'boost', name: 'DNA Boost', count: boostCount, description: 'Doubles DNA for next correct answers.', iconSymbol: '2x' },
+                { id: 'timeFreeze', name: 'Time Freeze', count: timeFreezeCount, description: 'Conceptual: Freezes timer (timer N/A).', iconSymbol: '⏳' },
+                { id: 'answerShield', name: 'Answer Shield', count: answerShieldCount, description: 'Protects DNA loss on 1 wrong answer.', iconSymbol: '🛡️' }
+            ];
+
+            powerupsData.forEach(p => {
+                if (p.count > 0) {
+                    const powerupDiv = document.createElement('div');
+                    powerupDiv.classList.add('powerup-icon');
+                    powerupDiv.textContent = `${p.iconSymbol} (x${p.count})`;
+                    powerupDiv.dataset.powerupId = p.id;
+                    powerupDiv.dataset.name = p.name;
+                    powerupDiv.dataset.description = p.description;
+                    powerupDiv.dataset.count = p.count;
+
+                    powerupDiv.addEventListener('mousemove', (event) => {
+                        const target = event.currentTarget;
+                        let tooltipText = `<strong>${target.dataset.name}</strong><br>${target.dataset.description}`;
+                        const currentDisplayCount = target.dataset.count;
+                        if (target.dataset.powerupId === 'boost') {
+                             tooltipText += `<br>Boosted answers left: ${currentDisplayCount}`;
+                        } else {
+                             tooltipText += `<br>Uses left: ${currentDisplayCount}`;
+                        }
+                        powerupTooltip.innerHTML = tooltipText;
+                        powerupTooltip.style.display = 'block';
+                        let x = event.pageX + 15;
+                        let y = event.pageY + 15;
+                        const tooltipRect = powerupTooltip.getBoundingClientRect();
+                        const bodyRect = document.body.getBoundingClientRect();
+                        if (x + tooltipRect.width > bodyRect.width) x = event.pageX - tooltipRect.width - 15;
+                        if (y + tooltipRect.height > (window.innerHeight + window.scrollY) ) y = event.pageY - tooltipRect.height - 15;
+                        if (x < 0) x = 0;
+                        if (y < window.scrollY) y = window.scrollY;
+                        powerupTooltip.style.left = `${x}px`;
+                        powerupTooltip.style.top = `${y}px`;
+                    });
+                    powerupDiv.addEventListener('mouseout', () => {
+                        powerupTooltip.style.display = 'none';
+                    });
+                    purchasedPowerupsContainer.appendChild(powerupDiv);
+                }
+            });
+        }
+
+
+        function selectQuestion() {
+            const gradeQuestions = questions[selectedGrade] && questions[selectedGrade][selectedUnit];
+            if (!gradeQuestions || gradeQuestions.length === 0) {
+                questionText.textContent = "No questions available for this unit.";
+                answerOptions.innerHTML = "";
+                submitButton.classList.add("hidden");
+                nextButton.classList.add("hidden");
+                if (feedback.textContent.includes("You've seen all questions")) {
+                    feedback.classList.add("hidden");
+                }
+                currentQuestion = null;
+                return;
+            }
+            if (usedQuestionIndices.length === gradeQuestions.length) {
+                feedback.textContent = "You've seen all questions for this unit! Restarting unit questions.";
+                feedback.classList.remove("hidden", "bg-red-100", "text-red-700", "border-red-400", "bg-green-100", "text-green-700", "border-green-400", "bg-yellow-100", "text-yellow-700", "border-yellow-400");
+                feedback.classList.add("bg-blue-100", "text-blue-700", "border-blue-400");
+                usedQuestionIndices = [];
+            }
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * gradeQuestions.length);
+            } while (usedQuestionIndices.includes(randomIndex));
+            currentQuestionIndex = randomIndex;
+            usedQuestionIndices.push(randomIndex);
+            currentQuestion = gradeQuestions[currentQuestionIndex];
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function resetHintButton() {
+            hintButton.disabled = false;
+        }
+
+        function resetPowerupButtons() {
+            useFiftyFiftyButton.disabled = fiftyFiftyCount <= 0 || fiftyFiftyAppliedThisQuestion;
+            useSkipButton.disabled = skipCount <= 0;
+        }
+
+        function loadQuestion() {
+            selectQuestion();
+            if (!currentQuestion) {
+                 questionText.textContent = "Select a grade and unit to start.";
+                 answerOptions.innerHTML = "";
+                 submitButton.classList.add("hidden");
+                 nextButton.classList.add("hidden");
+                 resetPowerupButtons();
+                 return;
+            }
+
+            questionText.textContent = currentQuestion.question;
+            answerOptions.innerHTML = "";
+            submitButton.classList.add("hidden");
+            submitButton.classList.remove("block");
+
+            const shuffledAnswers = [...currentQuestion.answers];
+            shuffleArray(shuffledAnswers);
+
+            shuffledAnswers.forEach((answer) => {
+                const listItem = document.createElement("li");
+                listItem.textContent = answer.text;
+                listItem.className = "bg-indigo-100 hover:bg-indigo-200 text-gray-800 rounded-md py-2.5 px-5 cursor-pointer transition-colors duration-300 text-center";
+                listItem.dataset.correct = answer.correct;
+                listItem.addEventListener("click", handleAnswerSelection);
+                answerOptions.appendChild(listItem);
+            });
+
+            if (!feedback.textContent.includes("You've seen all questions")) {
+                 feedback.classList.add("hidden");
+            }
+            nextButton.classList.remove("block");
+            nextButton.classList.add("hidden");
+
+            fiftyFiftyAppliedThisQuestion = false;
+            answerShieldActive = answerShieldCount > 0;
+            resetHintButton();
+            resetPowerupButtons();
+
+            boostActive = boostCount > 0;
+            localStorage.setItem('boostCount', boostCount);
+        }
+
+        function handleAnswerSelection(event) {
+            const selectedAnswer = event.target;
+            if (selectedAnswerElement) {
+                selectedAnswerElement.classList.remove("bg-blue-200", "border-2", "border-blue-400");
+            }
+            selectedAnswer.classList.add("bg-blue-200", "border-2", "border-blue-400");
+            selectedAnswerElement = selectedAnswer;
+            submitButton.classList.remove("hidden");
+            submitButton.classList.add("block");
+        }
+
+        function handleSubmitAnswer() {
+            if (!selectedAnswerElement) return;
+
+            const isCorrect = String(selectedAnswerElement.dataset.correct).toLowerCase() === "true";
+
+            Array.from(answerOptions.children).forEach((option) => {
+                option.removeEventListener("click", handleAnswerSelection);
+                option.classList.remove("hover:bg-indigo-200");
+                if (!option.classList.contains('answer-option-disabled')) {
+                    option.classList.add("opacity-50", "cursor-not-allowed");
+                }
+            });
+
+            if (isCorrect) {
+                selectedAnswerElement.classList.remove("bg-blue-200", "border-blue-400");
+                selectedAnswerElement.classList.add("bg-green-200", "border-2", "border-green-400", "text-green-700");
+                feedback.textContent = "Correct! Well done!";
+                feedback.classList.remove("hidden", "bg-red-100", "text-red-700", "border-red-400", "bg-yellow-100", "text-yellow-700", "border-yellow-400", "bg-blue-100", "text-blue-700", "border-blue-400");
+                feedback.classList.add("bg-green-100", "text-green-700", "border-green-400");
+                score++;
+                let pointsEarned = 5;
+                if (boostActive && boostCount > 0) {
+                    pointsEarned = 10;
+                    boostCount--;
+                    localStorage.setItem('boostCount', boostCount);
+                    if (boostCount === 0) boostActive = false;
+                    renderPurchasedPowerups();
+                }
+                currency += pointsEarned;
+            } else {
+                selectedAnswerElement.classList.remove("bg-blue-200", "border-blue-400");
+                selectedAnswerElement.classList.add("bg-red-200", "border-2", "border-red-400", "text-red-700");
+                feedback.textContent = "Wrong answer!";
+
+                if (answerShieldActive && answerShieldCount > 0) {
+                    answerShieldCount--;
+                    localStorage.setItem('answerShieldCount', answerShieldCount);
+                    answerShieldActive = false;
+                    renderPurchasedPowerups();
+                    feedback.textContent += " Shield protected your DNA!";
+                } else {
+                    feedback.textContent += " Try the next question.";
+                }
+
+                feedback.classList.remove("hidden", "bg-green-100", "text-green-700", "border-green-400", "bg-yellow-100", "text-yellow-700", "border-yellow-400", "bg-blue-100", "text-blue-700", "border-blue-400");
+                feedback.classList.add("bg-red-100", "text-red-700", "border-red-400");
+                Array.from(answerOptions.children).forEach((option) => {
+                    if (String(option.dataset.correct).toLowerCase() === "true") {
+                        option.classList.remove("bg-indigo-100", "opacity-50", "cursor-not-allowed");
+                        option.classList.add("bg-green-200", "border-2", "border-green-400", "text-green-700");
+                    }
+                });
+            }
+            currencyDisplay.textContent = `DNA: ${currency}`;
+            localStorage.setItem('dna', currency);
+            nextButton.classList.remove("hidden");
+            nextButton.classList.add("block");
+            submitButton.classList.add("hidden");
+            submitButton.classList.remove("block");
+            selectedAnswerElement = null;
+            useFiftyFiftyButton.disabled = true;
+            useSkipButton.disabled = true;
+            hintButton.disabled = true;
+        }
+
+        function loadNextQuestion() {
+             if (feedback.textContent.includes("You've seen all questions")) {
+                feedback.classList.add("hidden");
+                feedback.textContent = "";
+            }
+            loadQuestion();
+        }
+
+        function mainQuizRestart() {
+            currentQuestionIndex = 0;
+            score = 0;
+            usedQuestionIndices = [];
+            feedback.classList.add("hidden");
+            loadQuestion();
+        }
+
+        function setGrade(grade) {
+            selectedGrade = grade;
+            document.querySelectorAll('.grade-button').forEach(button => {
+                button.classList.remove('bg-yellow-500', 'text-gray-800', 'bg-blue-500', 'text-white', 'shadow-md');
+                button.classList.remove('bg-yellow-400', 'bg-blue-400');
+                if (button.id === `grade-${grade}-button`) {
+                    if (grade === 6) button.classList.add('bg-yellow-500', 'text-gray-800', 'shadow-md');
+                    else button.classList.add('bg-blue-500', 'text-white', 'shadow-md');
+                } else {
+                    if (button.id === 'grade-6-button') button.classList.add('bg-yellow-400', 'text-gray-800');
+                    else button.classList.add('bg-blue-400', 'text-white');
+                }
+            });
+
+            const grade6Units = [
+                { id: 1, name: "Earth & Space", color: "bg-purple-400", hover: "hover:bg-purple-500", activeColor: "bg-purple-600" },
+                { id: 2, name: "Life Science", color: "bg-purple-400", hover: "hover:bg-purple-500", activeColor: "bg-purple-600" },
+                { id: 3, name: "Physical Science", color: "bg-purple-400", hover: "hover:bg-purple-500", activeColor: "bg-purple-600" }
+            ];
+            const grade7Units = [
+                { id: 1, name: "Cells & Heredity", color: "bg-sky-500", hover: "hover:bg-sky-600", activeColor: "bg-sky-700" },
+                { id: 2, name: "Human Body Systems", color: "bg-sky-500", hover: "hover:bg-sky-600", activeColor: "bg-sky-700" },
+                { id: 3, name: "Ecology & Environment", color: "bg-sky-500", hover: "hover:bg-sky-600", activeColor: "bg-sky-700" },
+                { id: 4, name: "Chemistry & Physics", color: "bg-sky-500", hover: "hover:bg-sky-600", activeColor: "bg-sky-700" }
+            ];
+
+            const unitsToDisplay = grade === 6 ? grade6Units : grade7Units;
+            unitButtonContainer.innerHTML = '';
+
+            unitsToDisplay.forEach(unitConfig => {
+                const button = document.createElement('button');
+                button.id = `unit-${unitConfig.id}-button`;
+                button.dataset.unit = unitConfig.id;
+                button.textContent = unitConfig.name;
+                button.className = `unit-button text-white font-semibold py-2 px-3 text-sm rounded-md transition-colors duration-300 ${unitConfig.color} ${unitConfig.hover}`;
+                button.addEventListener('click', () => setUnit(unitConfig.id));
+                unitButtonContainer.appendChild(button);
+            });
+            
+            selectedUnit = 1;
+            const firstUnitButton = unitButtonContainer.querySelector(`[data-unit="1"]`);
+            if (firstUnitButton) {
+                const activeConfig = unitsToDisplay.find(u => u.id === 1);
+                if (activeConfig) {
+                    firstUnitButton.classList.remove(activeConfig.color);
+                    firstUnitButton.classList.add(activeConfig.activeColor, 'shadow-md');
+                }
+            }
+            mainQuizRestart();
+        }
+
+
+        function setUnit(unit) {
+            selectedUnit = unit;
+            const unitsConfig = selectedGrade === 6 ? [
+                { id: 1, name: "Earth & Space", color: "bg-purple-400", hover: "hover:bg-purple-500", activeColor: "bg-purple-600" },
+                { id: 2, name: "Life Science", color: "bg-purple-400", hover: "hover:bg-purple-500", activeColor: "bg-purple-600" },
+                { id: 3, name: "Physical Science", color: "bg-purple-400", hover: "hover:bg-purple-500", activeColor: "bg-purple-600" }
+            ] : [
+                { id: 1, name: "Cells & Heredity", color: "bg-sky-500", hover: "hover:bg-sky-600", activeColor: "bg-sky-700" },
+                { id: 2, name: "Human Body Systems", color: "bg-sky-500", hover: "hover:bg-sky-600", activeColor: "bg-sky-700" },
+                { id: 3, name: "Ecology & Environment", color: "bg-sky-500", hover: "hover:bg-sky-600", activeColor: "bg-sky-700" },
+                { id: 4, name: "Chemistry & Physics", color: "bg-sky-500", hover: "hover:bg-sky-600", activeColor: "bg-sky-700" }
+            ];
+
+            unitButtonContainer.querySelectorAll('.unit-button').forEach(button => {
+                const buttonUnitId = parseInt(button.dataset.unit);
+                const config = unitsConfig.find(u => u.id === buttonUnitId);
+                if (config) {
+                    button.classList.remove(config.activeColor, 'shadow-md');
+                    button.classList.add(config.color);
+                }
+            });
+
+            const activeUnitButton = unitButtonContainer.querySelector(`[data-unit="${unit}"]`);
+            const activeConfig = unitsConfig.find(u => u.id === unit);
+            if (activeUnitButton && activeConfig) {
+                 activeUnitButton.classList.remove(activeConfig.color);
+                 activeUnitButton.classList.add(activeConfig.activeColor, 'shadow-md');
+            }
+            mainQuizRestart();
+        }
+
+        function showHint() {
+            if (!currentQuestion) {
+                feedback.textContent = "No question loaded to give a hint for.";
+                feedback.classList.remove("hidden", "bg-green-100", "text-green-700", "border-green-400", "bg-yellow-100", "text-yellow-700", "border-yellow-400", "bg-blue-100", "text-blue-700", "border-blue-400");
+                feedback.classList.add("bg-red-100", "text-red-700", "border-red-400");
+                return;
+            }
+            if (currency >= hintCost) {
+                currency -= hintCost;
+                currencyDisplay.textContent = `DNA: ${currency}`;
+                localStorage.setItem('dna', currency);
+
+                let correctAnswerText = "";
+                for (const answer of currentQuestion.answers) {
+                    if (String(answer.correct).toLowerCase() === "true") {
+                        correctAnswerText = answer.text;
+                        break;
+                    }
+                }
+
+                let hintMsg = "Hint: Think carefully!";
+                if (correctAnswerText) {
+                    hintMsg = `Hint: The correct answer starts with the letter '${correctAnswerText.charAt(0).toUpperCase()}'.`;
+                }
+                
+                feedback.textContent = hintMsg;
+                feedback.classList.remove("hidden", "bg-green-100", "text-green-700", "border-green-400", "bg-red-100", "text-red-700", "border-red-400", "bg-blue-100", "text-blue-700", "border-blue-400");
+                feedback.classList.add("bg-yellow-100", "text-yellow-700", "border-yellow-400");
+                hintButton.disabled = true;
+            } else {
+                feedback.textContent = "Not enough DNA for a hint!";
+                feedback.classList.remove("hidden", "bg-green-100", "text-green-700", "border-green-400", "bg-yellow-100", "text-yellow-700", "border-yellow-400", "bg-blue-100", "text-blue-700", "border-blue-400");
+                feedback.classList.add("bg-red-100", "text-red-700", "border-red-400");
+            }
+        }
+
+        function useFiftyFifty() {
+            if (fiftyFiftyCount > 0 && currentQuestion && !fiftyFiftyAppliedThisQuestion) {
+                fiftyFiftyCount--;
+                localStorage.setItem('fiftyFiftyCount', fiftyFiftyCount);
+                renderPurchasedPowerups();
+                fiftyFiftyAppliedThisQuestion = true;
+                useFiftyFiftyButton.disabled = true;
+
+                const answerElements = Array.from(answerOptions.children);
+                const incorrectAnswers = answerElements.filter(el => String(el.dataset.correct).toLowerCase() === "false");
+
+                shuffleArray(incorrectAnswers);
+                let removedCount = 0;
+                for (let i = 0; i < incorrectAnswers.length && removedCount < 2; i++) {
+                    incorrectAnswers[i].classList.add('answer-option-disabled');
+                    if (selectedAnswerElement === incorrectAnswers[i]) {
+                        selectedAnswerElement.classList.remove("bg-blue-200", "border-2", "border-blue-400");
+                        selectedAnswerElement = null;
+                        submitButton.classList.add("hidden");
+                        submitButton.classList.remove("block");
+                    }
+                    removedCount++;
+                }
+                feedback.textContent = "50/50 used! Two incorrect options removed.";
+                feedback.classList.remove("hidden", "bg-red-100", "text-red-700", "border-red-400", "bg-green-100", "text-green-700", "border-green-400", "bg-blue-100", "text-blue-700", "border-blue-400");
+                feedback.classList.add("bg-yellow-100", "text-yellow-700", "border-yellow-400");
+
+            } else if (fiftyFiftyCount <= 0) {
+                feedback.textContent = "No 50/50 power-ups left!";
+                feedback.classList.remove("hidden", "bg-yellow-100", "text-yellow-700", "border-yellow-400", "bg-green-100", "text-green-700", "border-green-400", "bg-blue-100", "text-blue-700", "border-blue-400");
+                feedback.classList.add("bg-red-100", "text-red-700", "border-red-400");
+            }
+        }
+
+        function useSkipQuestion() {
+            if (skipCount > 0 && currentQuestion) {
+                skipCount--;
+                localStorage.setItem('skipCount', skipCount);
+                renderPurchasedPowerups();
+                useSkipButton.disabled = true;
+
+                feedback.textContent = "Question skipped!";
+                feedback.classList.remove("hidden", "bg-red-100", "text-red-700", "border-red-400", "bg-green-100", "text-green-700", "border-green-400", "bg-blue-100", "text-blue-700", "border-blue-400");
+                feedback.classList.add("bg-yellow-100", "text-yellow-700", "border-yellow-400");
+
+                nextButton.classList.add("hidden");
+                nextButton.classList.remove("block");
+                submitButton.classList.add("hidden");
+                submitButton.classList.remove("block");
+                if(selectedAnswerElement) {
+                    selectedAnswerElement.classList.remove("bg-blue-200", "border-2", "border-blue-400");
+                    selectedAnswerElement = null;
+                }
+                setTimeout(() => {
+                    loadNextQuestion();
+                }, 1000);
+
+            } else if (skipCount <= 0) {
+                feedback.textContent = "No Skip Question power-ups left!";
+                feedback.classList.remove("hidden", "bg-yellow-100", "text-yellow-700", "border-yellow-400", "bg-green-100", "text-green-700", "border-green-400", "bg-blue-100", "text-blue-700", "border-blue-400");
+                feedback.classList.add("bg-red-100", "text-red-700", "border-red-400");
+            }
+        }
+
+
+        // Shop Buy Button Event Listeners
+        buyFiftyFiftyButton.addEventListener("click", () => {
+            if (currency >= fiftyFiftyCost) {
+                currency -= fiftyFiftyCost;
+                localStorage.setItem('dna', currency);
+                currencyDisplay.textContent = `DNA: ${currency}`;
+                fiftyFiftyCount++;
+                localStorage.setItem('fiftyFiftyCount', fiftyFiftyCount);
+                renderPurchasedPowerups();
+                resetPowerupButtons();
+                alert("50/50 purchased! It's now available in the top-left.");
+            } else {
+                alert("Not enough DNA to buy 50/50!");
+            }
+        });
+
+        buySkipButton.addEventListener("click", () => {
+            if (currency >= skipCost) {
+                currency -= skipCost;
+                localStorage.setItem('dna', currency);
+                currencyDisplay.textContent = `DNA: ${currency}`;
+                skipCount++;
+                localStorage.setItem('skipCount', skipCount);
+                renderPurchasedPowerups();
+                resetPowerupButtons();
+                alert("Skip Question power-up purchased! It's now available in the top-left.");
+            } else {
+                alert("Not enough DNA to buy Skip Question!");
+            }
+        });
+
+        buyBoostButton.addEventListener("click", () => {
+            if (currency >= boostCost) {
+                currency -= boostCost;
+                localStorage.setItem('dna', currency);
+                currencyDisplay.textContent = `DNA: ${currency}`;
+                boostCount += 2;
+                localStorage.setItem('boostCount', boostCount);
+                if (boostCount > 0) boostActive = true;
+                renderPurchasedPowerups();
+                alert("Boost purchased! Your next 2 correct answers will earn double DNA. Check top-left for status.");
+            } else {
+                alert("Not enough DNA to buy Boost!");
+            }
+        });
+
+        buyTimeFreezeButton.addEventListener("click", () => {
+            if (currency >= timeFreezeCost) {
+                currency -= timeFreezeCost;
+                localStorage.setItem('dna', currency);
+                currencyDisplay.textContent = `DNA: ${currency}`;
+                timeFreezeCount++;
+                localStorage.setItem('timeFreezeCount', timeFreezeCount);
+                renderPurchasedPowerups();
+                alert("Time Freeze purchased! (Conceptual power-up)");
+            } else {
+                alert("Not enough DNA to buy Time Freeze!");
+            }
+        });
+
+        buyAnswerShieldButton.addEventListener("click", () => {
+            if (currency >= answerShieldCost) {
+                currency -= answerShieldCost;
+                localStorage.setItem('dna', currency);
+                currencyDisplay.textContent = `DNA: ${currency}`;
+                answerShieldCount++;
+                localStorage.setItem('answerShieldCount', answerShieldCount);
+                renderPurchasedPowerups();
+                alert("Answer Shield purchased! Your next incorrect answer won't lose DNA.");
+            } else {
+                alert("Not enough DNA to buy Answer Shield!");
+            }
+        });
+
+
+        // Event Listeners for Quiz Controls
+        grade6Button.addEventListener("click", () => setGrade(6));
+        grade7Button.addEventListener("click", () => setGrade(7));
+        nextButton.addEventListener("click", loadNextQuestion);
+        submitButton.addEventListener("click", handleSubmitAnswer);
+        hintButton.addEventListener("click", showHint);
+        useFiftyFiftyButton.addEventListener("click", useFiftyFifty);
+        useSkipButton.addEventListener("click", useSkipQuestion);
+
+        shopButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            document.getElementById('shop-section').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Initial Setup
+        renderPurchasedPowerups();
+        setGrade(selectedGrade);
+
+    </script>
+</body>
+</html>
